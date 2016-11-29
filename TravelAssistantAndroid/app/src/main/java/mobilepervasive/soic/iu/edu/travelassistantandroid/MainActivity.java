@@ -1,4 +1,4 @@
-package voicetravelassist.android.mobiperv.iu.edu.travelassistantandroid;
+package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.support.v7.app.AppCompatActivity;
 import java.util.ArrayList;
@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                getString(R.string.speech_prompt));
+                "Say Something..");
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
             Toast.makeText(getApplicationContext(),
-                    getString(R.string.speech_not_supported),
+                    "Sorry your device doesn't support text input.",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -83,14 +83,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
 
-            
+
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 }
