@@ -3,22 +3,16 @@ package mobilepervasive.soic.iu.edu.travelassistantandroid;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.provider.Telephony;
 import android.speech.tts.TextToSpeech;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
-
-import java.util.Locale;
 
 /**
  * Created by mangirish on 11/29/16.
  */
 
 public class SmsListener extends BroadcastReceiver{
-
-    private SharedPreferences preferences;
-    TextToSpeech t1;
 
     @Override
     public void onReceive(Context context, Intent intent) {

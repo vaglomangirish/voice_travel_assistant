@@ -1,6 +1,8 @@
 package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtSpeechInput;
     private ImageButton btnSpeak;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private BroadcastReceiver receiver;
+
     private static TextToSpeech ttsp;
 
     @Override
@@ -51,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(Intent.ACTION_BATTERY_LOW);
+        receiver = new BatteryLevelReceiver();
+        registerReceiver(receiver, filter);
 
     }
 
@@ -105,6 +115,12 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     public static TextToSpeech getTtsp() {
