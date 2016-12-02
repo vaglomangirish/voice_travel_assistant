@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -171,17 +172,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             ttsp.speak("Hello, how may I help you?", TextToSpeech.QUEUE_FLUSH, null);
             switchSearch(QUESTION_ASK);
         } else if (text.contains(QUESTION_ASK)) {
+            Log.v(TAG, "DOING NOTHING");
             ttsp.speak(getString(R.string.question_text), TextToSpeech.QUEUE_FLUSH, null);
 
-            // add delay of 2 seconds
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // trigger the speech recognition prompt
-                    switchSearch("asking-a-question");
-                }
-            }, 2000);
-
+            SystemClock.sleep(1500);
+            switchSearch("asking-a-question");
         }
     }
 
@@ -194,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+
+            Log.v(TAG, "ON RESULT | text: " + text);
         }
     }
 
@@ -300,9 +297,13 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
-                    txtSpeechInput.setText(result.get(0));
+                    String command = result.get(0);
+                    txtSpeechInput.setText(command);
 
-                    ttsp.speak("I heard, " + result.get(0), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsp.speak("I heard, " + command, TextToSpeech.QUEUE_FLUSH, null);
+
+                    // process the voice command
+                    processVoiceCommand(QUESTION_ASK, command);
 
                     // switch back to voice recognition
                     switchSearch(KWS_SEARCH);
@@ -312,6 +313,23 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     switchSearch(KWS_SEARCH);
                 }
                 break;
+            }
+        }
+    }
+
+    private void processVoiceCommand(String searchName, String commandText) {
+        Log.v(TAG, "Processing voice command for category: " + searchName + ", command text: " + commandText);
+
+        switch (searchName) {
+            case QUESTION_ASK: {
+                if(QuestionAnsweringUtil.belongsToCategory(commandText)) {
+                    Log.v(TAG, "This question belongs to category: " + QuestionAnsweringUtil.getQuestionCategory());
+                    QuestionAnsweringUtil.processQuestion(commandText);
+                    if (QuestionAnsweringUtil.getDestinationName() != null) {
+                        ttsp.speak("Okay. I figured out your destination as " + QuestionAnsweringUtil.getDestinationName(), TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                    break;
+                }
             }
         }
     }
