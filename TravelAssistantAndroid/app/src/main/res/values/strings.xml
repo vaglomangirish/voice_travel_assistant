@@ -2,6 +2,7 @@
     <string name="app_name">TravelAssistantAndroid</string>
     <string name="action_settings">Settings</string>
     <string name="kws_caption">To invoke the assistant say \"hello assistant\"</string>
+    <string name="question_text">Yes, what is your question?</string>
     <string name="init_fail">Failed to init recognizer: %s</string>
     <string name="mic_text">Tap on mic to speak</string>
     <string name="startup_message">Preparing the recognizer</string>

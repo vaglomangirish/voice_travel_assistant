@@ -1,0 +1,7 @@
+#JSGF V1.0;
+
+grammar question;
+
+<word> = i | have | had | a | can | ask | one | you | would | like | to;
+
+public <question> = <word>* question <word>*;

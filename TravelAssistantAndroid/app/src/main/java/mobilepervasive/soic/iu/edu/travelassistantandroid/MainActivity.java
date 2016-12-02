@@ -2,10 +2,10 @@ package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,10 +20,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +37,8 @@ import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity implements RecognitionListener {
 
+    private static final String TAG = "TravelAssistantActivity";
+
     private TextView txtSpeechInput;
     private TextView captionTxt;
     private ImageButton btnSpeak;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     /* Named searches allow to quickly reconfigure the decoder */
     private static final String KWS_SEARCH = "wakeup";
+    private static final String QUESTION_ASK = "question";
 
     /* Keyword we are looking for to activate menu */
     private static final String KEYPHRASE = "hello assistant";
@@ -55,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     private SpeechRecognizer recognizer;
+
+    /* Handler for adding delays */
+    private final Handler handler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,14 +160,29 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
+        if (hypothesis == null) {
             return;
-
-        String text = hypothesis.getHypstr();
-        if (text.equals(KEYPHRASE)) {
-            switchSearch("prompt-speech-recognizer");
         }
 
+        String text = hypothesis.getHypstr();
+        Log.v(TAG, "Text is: " + text);
+
+        if (text.equals(KEYPHRASE)) {
+            ttsp.speak("Hello, how may I help you?", TextToSpeech.QUEUE_FLUSH, null);
+            switchSearch(QUESTION_ASK);
+        } else if (text.contains(QUESTION_ASK)) {
+            ttsp.speak(getString(R.string.question_text), TextToSpeech.QUEUE_FLUSH, null);
+
+            // add delay of 2 seconds
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // trigger the speech recognition prompt
+                    switchSearch("asking-a-question");
+                }
+            }, 2000);
+
+        }
     }
 
     /**
@@ -191,11 +213,19 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private void switchSearch(String searchName) {
         recognizer.stop();
 
+        // caption text
+        String caption = "";
+
         // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
-        if (searchName.equals(KWS_SEARCH))
+        if (searchName.equals(KWS_SEARCH)) {
             recognizer.startListening(searchName);
-        else
+        }
+        else if (searchName.equals(QUESTION_ASK)) {
+            recognizer.startListening(searchName, 10000);
+        }
+        else {
             promptSpeechInput();
+        }
 
         // print caption
         captionTxt.setText(R.string.kws_caption);
@@ -217,6 +247,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         // Create keyword-activation search.
         recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
+
+        // Create grammar-based search for selection between demos
+        File questionGrammar = new File(assetsDir, "question_ask.gram");
+        recognizer.addGrammarSearch(QUESTION_ASK, questionGrammar);
     }
 
     @Override
@@ -245,6 +279,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             Toast.makeText(getApplicationContext(),
                     "Sorry your device doesn't support text input.",
                     Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(),
+                    "Something went wrong!",
+                    Toast.LENGTH_SHORT).show();
+            switchSearch(KWS_SEARCH);
         }
     }
 
@@ -261,9 +300,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
-                    // print the result
-                    System.out.println(result);
-
                     txtSpeechInput.setText(result.get(0));
 
                     ttsp.speak("I heard, " + result.get(0), TextToSpeech.QUEUE_FLUSH, null);
@@ -271,10 +307,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     // switch back to voice recognition
                     switchSearch(KWS_SEARCH);
                 }
+                else if (resultCode == RESULT_CANCELED) {
+                    // the intent was cancelled, switch listener on
+                    switchSearch(KWS_SEARCH);
+                }
                 break;
             }
-
-
         }
     }
 
