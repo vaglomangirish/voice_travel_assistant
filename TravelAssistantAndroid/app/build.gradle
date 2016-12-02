@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
-        applicationId "mobilepervasive.soic.iu.edu.travelassistantandroid19"
+        applicationId "mobilepervasive.soic.iu.edu.travelassistantandroid"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
@@ -28,3 +28,7 @@ dependencies {
     compile 'com.android.support:design:25.0.1'
     testCompile 'junit:junit:4.12'
 }
+
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)
