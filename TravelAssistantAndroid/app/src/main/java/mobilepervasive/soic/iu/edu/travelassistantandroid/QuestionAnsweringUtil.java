@@ -1,11 +1,16 @@
 package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by goshenoy on 12/2/16.
@@ -23,13 +28,19 @@ public class QuestionAnsweringUtil {
     private static final String NEAREST_BUS_STATIONS = "nearest_bus_stations";
     private static final String NEXT_BUS_TO_DEST = "next_bus_to_dest";
 
+    // utility class for calling apis
+    private static APIUtil apiUtil = new APIUtil();
+
     static {
         questionMap.put(NEAREST_BUS_STATIONS, getTagsForNearestBusstops());
         questionMap.put(NEXT_BUS_TO_DEST, getTagsForNextBusToDest());
     }
 
-    public static void processQuestion(String questionText) {
+    public static void processQuestion(String questionText, double latitude, double longitude) {
         lastQuestion = questionText;
+        if (questionCategory.equals(NEAREST_BUS_STATIONS)) {
+            apiUtil.getNearestBusStops(latitude, longitude);
+        }
     }
 
     public static String getLastQuestion() {

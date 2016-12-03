@@ -2,8 +2,12 @@ package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -57,12 +61,18 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
     private SpeechRecognizer recognizer;
 
     /* Handler for adding delays */
     private final Handler handler = new Handler();
 
+    /* GPS related variables */
+    LocationManager lm;
+    Location location;
+    double longitude;
+    double latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +120,35 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             return;
         }
         runRecognizerSetup();
+
+        // Check if user has given permission to access location
+        permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_FINE_LOCATION);
+            return;
+        }
+
+        // initialize gps
+        lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+        Log.v(TAG, "Latitude: " + latitude + ", Longitude: " + longitude);
+
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
     }
+
+    private final LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+
+        public void onProviderDisabled(String provider) {}
+        public void onProviderEnabled(String provider) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    };
 
     private void runRecognizerSetup() {
         // Recognizer initialization is a time-consuming and it involves IO,
@@ -324,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             case QUESTION_ASK: {
                 if(QuestionAnsweringUtil.belongsToCategory(commandText)) {
                     Log.v(TAG, "This question belongs to category: " + QuestionAnsweringUtil.getQuestionCategory());
-                    QuestionAnsweringUtil.processQuestion(commandText);
+                    QuestionAnsweringUtil.processQuestion(commandText, latitude, longitude);
                     if (QuestionAnsweringUtil.getDestinationName() != null) {
                         ttsp.speak("Okay. I figured out your destination as " + QuestionAnsweringUtil.getDestinationName(), TextToSpeech.QUEUE_FLUSH, null);
                     }
