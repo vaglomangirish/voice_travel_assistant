@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     public static int DELAY_BETWEEN_CAPTURE =10000;
     public static int CAM_START_DELAY = 2000;
-    public static String IMAGE_FILE_NAME = "/sdcard/Download/capture.png";
+    public static String IMAGE_FILE_NAME = "capture.png";
 
     public static int CAPTURE_COUNT = 3;
 
@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     }
                     break;
                 } else {
-                    CAPTURE_COUNT = 3;
+//                    CAPTURE_COUNT = 3;
 //                    runObjectDetection();
                 }
             }
@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
-        Log.v("DEBUG", "SurfaceCreatedInvoked");
+        Log.v(TAG, "SurfaceCreatedInvoked");
         // The Surface has been created, acquire the camera and tell it where
         // to draw the preview.
         capcam = Camera.open();
@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Log.v("DEBUG", "surface changed invoked.");
+        Log.v(TAG, "surface changed invoked.");
         // Do Nothing
     }
 
@@ -487,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     public void capturePicture() {
 
-        Log.v("DEBUG", "ca " + capcam);
+        Log.v(TAG, "ca " + capcam);
 
         //get camera parameters
         parameters = capcam.getParameters();
@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             @Override
             public void onPictureTaken(byte[] data, Camera camera)
             {
-                Log.v("DEBUG", "On Picture taken invoked");
+                Log.v(TAG, "On Picture taken invoked");
                 FileOutputStream out = null;
 
                 //decode the data obtained by the camera into a Bitmap
@@ -534,9 +534,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 }
 
                 // Save to file.
-                Log.v("DEBUG", "Picture taken");
+                Log.v(TAG, "Picture taken");
 
-                Log.v("DEBUG", "Analysing image: " + IMAGE_FILE_NAME);
+                Log.v(TAG, "Analysing image: " + IMAGE_FILE_NAME);
                 //ttsp.speak("Approaching Crossroads", TextToSpeech.QUEUE_ADD, null);
 
                 CAPTURE_COUNT --;
@@ -555,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         // TODO: Should loop while IS_NAVIGATION_ON is true.
         //if(IS_NAVIGATION_ON) {
         if(CAPTURE_COUNT >= 0) {
-            Log.v("DEBUG", "Capture Count is " + CAPTURE_COUNT);
+            Log.v(TAG, "Capture Count is " + CAPTURE_COUNT);
             capturePicture();
         }
     }

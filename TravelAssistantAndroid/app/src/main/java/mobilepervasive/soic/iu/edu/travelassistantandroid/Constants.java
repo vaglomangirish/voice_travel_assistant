@@ -20,4 +20,13 @@ public class Constants {
     // response strings to speak
     public static final String NEAREST_BUS_RESPONSE_TEXT = "I have an answer! The nearest bus stop to your location is, %s.";
 
+    // Constants for Image Recognition.
+    public static final String IMAGE_CLASSIFIER_ID = "zcross_1753080880";
+
+    public static final String IMAGE_VP_API_KEY = "b34b3d1f4dc43112ea5933a5b8cbee86ee0b17d5";
+
+    public static final String IMAGE_VR_SERVICE_URL = "https://gateway-a.watsonplatform.net" +
+            "/visual-recognition/api/v3/classify?api_key=" +
+            IMAGE_VP_API_KEY + "&version=2016-05-20";
+
 }
