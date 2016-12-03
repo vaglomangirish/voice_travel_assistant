@@ -296,8 +296,15 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
      */
     @Override
     public void onEndOfSpeech() {
-        if (!recognizer.getSearchName().equals(KWS_SEARCH))
-            switchSearch(KWS_SEARCH);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 3s = 3000ms
+                if (!recognizer.getSearchName().equals(KWS_SEARCH))
+                    switchSearch(KWS_SEARCH);
+            }
+        }, 3000);
     }
 
     private void switchSearch(String searchName) {

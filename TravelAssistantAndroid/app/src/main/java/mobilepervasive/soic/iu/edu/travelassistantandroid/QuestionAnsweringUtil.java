@@ -179,7 +179,7 @@ public class QuestionAnsweringUtil {
     /**
      * Gets the tags for question related to finding out time to dest
      *  example questions:
-     *      - how long will take me to get there
+     *      - how long will it take me to get there
      *
      * @return
      */
