@@ -33,6 +33,7 @@ public class QuestionAnsweringUtil {
     private static final String NEXT_BUS_TO_DEST = "next_bus_to_dest";
     private static final String NEXT_BUS_DETAILS = "next_bus_details";
     private static final String TIME_DO_DEST = "time_to_dest";
+    private static final String REQUEST_UBER_RIDE = "request_uber_ride";
 
     // utility class for calling apis
     private static APIUtil apiUtil = new APIUtil();
@@ -42,6 +43,7 @@ public class QuestionAnsweringUtil {
         questionMap.put(NEXT_BUS_TO_DEST, getTagsForNextBusToDest());
         questionMap.put(NEXT_BUS_DETAILS, getTagsForNextBusDetails());
         questionMap.put(TIME_DO_DEST, getTagsForTimeToDest());
+        questionMap.put(REQUEST_UBER_RIDE, getTagsForRequestUberRide());
     }
 
     public static void processQuestion(String questionText, double latitude, double longitude) {
@@ -59,6 +61,9 @@ public class QuestionAnsweringUtil {
             } else if(questionCategory.equals(TIME_DO_DEST)) {
                 // submit api call
                 apiUtil.getTimeToDest(destinationName, latitude, longitude);
+            } else if(questionCategory.equals(REQUEST_UBER_RIDE)) {
+                // submit api call
+                apiUtil.requestUberRide(destinationName, latitude, longitude);
             }
         } catch (Exception ex) {
             Log.e(TAG, "Failed to process question, reason: " + ex);
@@ -200,6 +205,30 @@ public class QuestionAnsweringUtil {
         return tags;
     }
 
+    /**
+     * Gets the tags for question related to booking an Uber to destination
+     *  example questions:
+     *      - can you book me an uber to xx
+     *      - please book me an uber to xx
+     *
+     * @return
+     */
+    private static List<String> getTagsForRequestUberRide() {
+        List<String> tags = new ArrayList<String>();
+        // start of question
+        tags.add("can");
+        tags.add("please");
+        tags.add("you");
+        tags.add("book");
+        // person
+        tags.add("me");
+        // general
+        tags.add("an");
+        tags.add("uber");
+        tags.add("to");
+        return tags;
+    }
+
     public static boolean belongsToCategory(String commandText) {
         boolean belongs = false;
         StringBuilder destination = new StringBuilder();
@@ -210,7 +239,8 @@ public class QuestionAnsweringUtil {
             for(String commandWord : commandText.split(" ")) {
                 // figure out the destination name
                 if (lastWord.equals("to")) {
-                    if (questionCategory.equals(NEXT_BUS_TO_DEST)) {
+                    if (questionCategory.equals(NEXT_BUS_TO_DEST) ||
+                            questionCategory.equals(REQUEST_UBER_RIDE)) {
                         destination.append(commandWord.toLowerCase())
                                 .append(" ");
                         continue;

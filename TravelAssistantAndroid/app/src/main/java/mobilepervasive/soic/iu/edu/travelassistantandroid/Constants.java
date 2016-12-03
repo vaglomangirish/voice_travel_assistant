@@ -17,8 +17,15 @@ public class Constants {
 
     public static final String TIME_TO_DEST_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/time_to_dest/%s?lat=%s&long=%s";
 
+    public static final String REQUEST_UBER_RIDE = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/requestride";
+
     // response strings to speak
     public static final String NEAREST_BUS_RESPONSE_TEXT = "I have an answer! The nearest bus stop to your location is, %s.";
+    public static final String REQUEST_UBER_SUCCESS = "Sure. I have submitted an UBER request for you. You should receive an SMS confirmation soon.";
+    public static final String REQUEST_UBER_FAILURE = "Sorry. Something went wrong & I could not book an UBER for you. Please try again.";
+
+    // api success response
+    public static final String API_SUCCESS_RESPONSE = "SUCCESS";
 
     // Constants for Image Recognition.
     public static final String IMAGE_CLASSIFIER_ID = "zcross_1753080880";
