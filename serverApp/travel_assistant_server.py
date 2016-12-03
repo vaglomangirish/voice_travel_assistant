@@ -62,7 +62,7 @@ def get_next_bus_to_dest(destination):
                                      mode='transit',
                                      transit_mode='bus')
 
-    # pprint(next_bus_info)
+    pprint(next_bus_info)
 
     if (next_bus_info.__len__() > 0):
         for leg_dict in next_bus_info[0]['legs']:
@@ -82,6 +82,83 @@ def get_next_bus_to_dest(destination):
     print response_str
     return response_str
 
+@app.route('/next_bus_details/<destination>')
+def get_next_bus_details(destination):
+    # extract lat, long from request
+    latitude = request.args.get('lat')
+    longitude = request.args.get('long')
+
+    # construct origin & destination coordinates
+    origin_coordinates = (latitude, longitude)
+    destination_coordinates = ()
+
+    # result pieces
+    bus_agency = None
+    bus_number = None
+    bus_name = None
+    bus_departing_at_time = None
+    bus_arriving_at_time = None
+    bus_departing_stop = None
+    bus_arriving_stop = None
+    bus_number_of_stops = None
+
+
+    # final output string
+    response_str = "The next bus to your destination, is number {}, {}. " \
+                   "This bus departs from station {}, at time {}. " \
+                   "After {} stops, it will arrive at station {}, at time {}. " \
+                   "This bus is operated by {}."
+
+    # use geocoding to get coordinates
+    destination_info = gmaps.geocode(destination)
+    if (destination_info.__len__() > 0):
+        dest_lat = destination_info[0]['geometry']['location']['lat']
+        dest_long = destination_info[0]['geometry']['location']['lng']
+        destination_coordinates = (dest_lat, dest_long)
+        pass
+
+    # get next bus details
+    next_bus_info = gmaps.directions(origin=origin_coordinates,
+                                     destination=destination_coordinates,
+                                     mode='transit',
+                                     transit_mode='bus')
+
+    # pprint(next_bus_info)
+
+    if (next_bus_info.__len__() > 0):
+        for leg_dict in next_bus_info[0]['legs']:
+            for steps_dict in leg_dict['steps']:
+                if steps_dict['travel_mode'] == 'TRANSIT':
+                    transit_details = steps_dict['transit_details']
+
+                    line = transit_details['line']
+
+                    # extract response pieces
+                    bus_agency = line['agencies'][0]['name']  # value = Bloomington Transit
+                    bus_number = line['short_name']
+                    bus_name = line['name']
+
+                    # extract arrival time & stop
+                    bus_arriving_stop = transit_details['arrival_stop']['name']
+                    bus_arriving_at_time = transit_details['arrival_time']['text']
+
+                    # extract departure time & stop
+                    bus_departing_stop = transit_details['departure_stop']['name']
+                    bus_departing_at_time = transit_details['departure_time']['text']
+
+                    # extract num stops
+                    bus_number_of_stops = transit_details['num_stops']
+
+    response_str = response_str.format(bus_number,
+                                       bus_name,
+                                       bus_departing_stop,
+                                       bus_departing_at_time,
+                                       bus_number_of_stops,
+                                       bus_arriving_stop,
+                                       bus_arriving_at_time,
+                                       bus_agency)
+    print response_str
+    return response_str
 
 def main():
     app.run()

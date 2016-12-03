@@ -142,23 +142,29 @@ public class QuestionAnsweringUtil {
     /**
      * Gets the tags for question related to getting more details about next bus
      *  example questions:
-     *      - can you give me some more details
-     *      - i need more details
-     *      - tell me more
+     *      - can you give me some more details about this bus
+     *      - i need more details about this bus
+     *      - tell me more about this bus
      * @return
      */
     private static List<String> getTagsForNextBusDetails() {
         List<String> tags = new ArrayList<String>();
+        // start of question
         tags.add("can");
         tags.add("you");
         tags.add("give");
         tags.add("tell");
+        // person
         tags.add("i");
         tags.add("me");
+        // general
         tags.add("need");
         tags.add("some");
         tags.add("more");
         tags.add("details");
+        tags.add("about");
+        tags.add("this");
+        tags.add("bus");
         return tags;
     }
 

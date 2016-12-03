@@ -424,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     break;
                 } else {
                     CAPTURE_COUNT = 3;
-                    runObjectDetection();
+//                    runObjectDetection();
                 }
             }
         }
