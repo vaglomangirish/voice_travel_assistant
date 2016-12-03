@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.provider.Telephony;
 import android.speech.tts.TextToSpeech;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -13,6 +14,8 @@ import android.widget.Toast;
  */
 
 public class SmsListener extends BroadcastReceiver{
+
+    private static final String TAG = "SmsListener";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -22,6 +25,17 @@ public class SmsListener extends BroadcastReceiver{
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                 String sender = smsMessage.getDisplayOriginatingAddress();
                 String messageBody = smsMessage.getMessageBody();
+
+                if (sender.startsWith("1410200")) {
+                    sender = "UBER Taxi Service";
+                } else {
+                    Log.v(TAG, sender + ", does not match");
+                }
+
+                if(messageBody.split("\n").length == 3) {
+                    messageBody = messageBody.split("\n")[2];
+                    messageBody = messageBody.split(":")[1];
+                }
 
                 Toast toast = Toast.makeText(context, messageBody, Toast.LENGTH_LONG);
                 toast.show();

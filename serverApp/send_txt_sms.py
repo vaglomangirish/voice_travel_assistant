@@ -22,8 +22,8 @@ def send_text_message(source, destination):
                         + source + ". His destination is " + destination
     req = requests.post(text_msg_url, data={'number': driver_phone, 'message': message_to_driver})
 
-    message_to_passenger = "Your drivers name is " + driver_name + " and your ride to " \
-              + destination + " is on the way to pick you up at " + source + "."
+    message_to_passenger = "Your driver's name is, Mr. " + driver_name + ". And your ride to, " \
+              + destination + ", is on the way to pick you up at, " + source + ". Thank you for choosing UBER."
     req = requests.post(text_msg_url, data={'number': passenger_phone, 'message': message_to_passenger})
 
     return "SUCCESS"
