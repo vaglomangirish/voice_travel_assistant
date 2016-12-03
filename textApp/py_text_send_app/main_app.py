@@ -7,31 +7,45 @@ import json
 app = Flask(__name__)
 text_msg_url = "http://textbelt.com/text"
 
-class MainApp:
+driver_name = "Mangirish"
+driver_phone = "8123695213"
 
-    text_msg_url = "http://textbelt.com/text"
+passenger_name = "Gourav"
+passenger_phone = "8123609729"
 
-    def __init__(self):
-        pass
-
-@app.route("/sendmsg", methods=['POST'])
-def send_text_message():
+def send_text_message(source, destination):
 
     """
     This is a REST method which requires json data in the following format:-
 
     {'number': '<number to send>', 'message': '<text to send>'}
 
-    :param number:
-    :param text:
-    :return:
     """
 
-    json_data = json.loads(request.data)
-    print(json_data["number"])
-    print(json_data["message"])
+    message_to_driver = "You have a ride! Please pick up " + passenger_name + " at "\
+                        + source + ". His destination is " + destination
+    req = requests.post(text_msg_url, data={'number': driver_phone, 'message': message_to_driver})
 
-    req = requests.post(text_msg_url, data={'number': json_data["number"], 'message': json_data["message"]})
+    message_to_passenger = "Your drivers name is " + driver_name + " and your ride to " \
+              + destination + " is on the way to pick you up at " + source + "."
+    req = requests.post(text_msg_url, data={'number': passenger_phone, 'message': message_to_passenger})
+
+    return "SUCCESS"
+
+
+@app.route("/requestride", methods=['POST'])
+def request_ride():
+    """
+    This is a REST method which requires json data in the following format:-
+
+    {'source': '<source name>', 'destination': '<destination name>'}
+
+    """
+    json_data = json.loads(request.data)
+    print(json_data["source"])
+    print(json_data["destination"])
+
+    send_text_message(json_data["source"], json_data["destination"])
 
     return "SUCCESS"
 
