@@ -25,8 +25,7 @@ def get_nearest_bustops():
     if(bus_stops_nearby['results'].__len__() > 0):
         pprint (bus_stops_nearby['results'][0]['name']) # get name of first result
 
-    print ((float(latitude), float(longitude)))
-    return app.response_class(str(bus_stops_nearby['results'][0]), content_type='application/json')
+    return bus_stops_nearby['results'][0]['name'].encode('utf-8')
 
 
 def main():

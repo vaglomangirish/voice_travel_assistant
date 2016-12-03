@@ -1,7 +1,11 @@
 package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +42,24 @@ public class QuestionAnsweringUtil {
 
     public static void processQuestion(String questionText, double latitude, double longitude) {
         lastQuestion = questionText;
-        if (questionCategory.equals(NEAREST_BUS_STATIONS)) {
-            apiUtil.getNearestBusStops(latitude, longitude);
+        try {
+            if (questionCategory.equals(NEAREST_BUS_STATIONS)) {
+                // submit api call
+                apiUtil.getNearestBusStops(latitude, longitude);
+
+//                while (!APIUtil.apiComplete) {
+//                    // api call is not complete, wait
+//                    Log.v(TAG, "API call submitted, waiting for response.");
+//                    SystemClock.sleep(1000);
+//                }
+//                // speak out response
+//                MainActivity.getTtsp().speak(String.format(Constants.NEAREST_BUS_RESPONSE_TEXT, APIUtil.responseObject.getString("name")), TextToSpeech.QUEUE_FLUSH, null);
+//
+//                // set api complete to false
+//                APIUtil.apiComplete = false;
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to process question, reason: " + ex);
         }
     }
 

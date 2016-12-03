@@ -1,7 +1,10 @@
 package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.os.AsyncTask;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -13,6 +16,8 @@ import okhttp3.Response;
 public class APIUtil {
 
     private static final String TAG = "APIUtil";
+    public static boolean apiComplete = false;
+    public static JSONObject responseObject;
 
     public void getNearestBusStops(double latitude, double longitude) {
         new NearestBusStopTask().execute(latitude, longitude);
@@ -41,6 +46,8 @@ public class APIUtil {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
             Log.d(TAG, "API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(String.format(Constants.NEAREST_BUS_RESPONSE_TEXT, response), TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 }

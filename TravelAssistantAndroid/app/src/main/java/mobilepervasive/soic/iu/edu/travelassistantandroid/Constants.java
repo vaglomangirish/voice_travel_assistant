@@ -5,10 +5,13 @@ package mobilepervasive.soic.iu.edu.travelassistantandroid;
  */
 public class Constants {
 
-    public static final String SERVER_HOSTNAME = "127.0.0.1";
+    public static final String SERVER_HOSTNAME = "52.53.190.177";
 
     public static final String SERVER_HOST_PORT = "5000";
 
     public static final String NEAREST_BUS_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/nearest_bustop?lat=%s&long=%s";
+
+    // response strings to speak
+    public static final String NEAREST_BUS_RESPONSE_TEXT = "I have an answer! The nearest bus stop to your location is, %s.";
 
 }
