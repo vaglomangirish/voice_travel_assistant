@@ -6,4 +6,5 @@
     <string name="init_fail">Failed to init recognizer: %s</string>
     <string name="mic_text">Tap on mic to speak</string>
     <string name="startup_message">Preparing the recognizer</string>
+    <string name="capture">CaptureImage</string>
 </resources>

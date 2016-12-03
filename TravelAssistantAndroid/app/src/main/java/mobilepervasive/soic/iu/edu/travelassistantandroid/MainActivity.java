@@ -5,6 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +20,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -27,8 +31,11 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,15 +49,40 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 
 import static android.widget.Toast.makeText;
 
-public class MainActivity extends AppCompatActivity implements RecognitionListener {
+public class MainActivity extends AppCompatActivity implements RecognitionListener,
+        SurfaceHolder.Callback {
 
     private static final String TAG = "TravelAssistantActivity";
+
+    public static int DELAY_BETWEEN_CAPTURE =10000;
+    public static int CAM_START_DELAY = 2000;
+    public static String IMAGE_FILE_NAME = "/sdcard/Download/capture.png";
+
+    public static int CAPTURE_COUNT = 3;
+
+    public static Boolean IS_NAVIGATION_ON = false;
 
     private TextView txtSpeechInput;
     private TextView captionTxt;
     private ImageButton btnSpeak;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     private BroadcastReceiver receiver;
+
+    //a variable to store a reference to the Image View at the main.xml file
+    private ImageView cap_image;
+    //a variable to store a reference to the Surface View at the main.xml file
+    private SurfaceView surfView;
+
+    //a bitmap to display the captured image
+    private Bitmap bitmp;
+
+    //Camera variables
+    //a surface holder
+    private SurfaceHolder surfhold;
+    //a variable to control the camera
+    private Camera capcam;
+    //the camera parameters
+    private Camera.Parameters parameters;
 
     private static TextToSpeech ttsp;
 
@@ -76,10 +108,31 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     double longitude;
     double latitude;
 
+    public static TextToSpeech getTtsp() {
+        return ttsp;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setContentView(R.layout.activity_main);
+
+        //get the Image View at the main.xml file
+        cap_image = (ImageView) findViewById(R.id.imgview);
+
+        //get the Surface View at the main.xml file
+        surfView = (SurfaceView) findViewById(R.id.surfview);
+
+        //Get a surface
+        surfhold = surfView.getHolder();
+
+        //add the callback interface methods defined below as the Surface View callbacks
+        surfhold.addCallback(this);
+
+        //tells Android that this surface will have its data constantly replaced
+        surfhold.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
         captionTxt = (TextView) findViewById(R.id.captionText);
@@ -369,6 +422,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                         ttsp.speak("Okay. I figured out your destination as " + QuestionAnsweringUtil.getDestinationName(), TextToSpeech.QUEUE_FLUSH, null);
                     }
                     break;
+                } else {
+                    CAPTURE_COUNT = 3;
+                    runObjectDetection();
                 }
             }
         }
@@ -392,7 +448,118 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
     }
 
-    public static TextToSpeech getTtsp() {
-        return ttsp;
+
+    ////////////////////// Camera Image Capture Section //////////////////////////////////////////
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder)
+    {
+        Log.v("DEBUG", "SurfaceCreatedInvoked");
+        // The Surface has been created, acquire the camera and tell it where
+        // to draw the preview.
+        capcam = Camera.open();
+        try {
+            capcam.setPreviewDisplay(holder);
+
+        } catch (IOException exception) {
+            capcam.release();
+            capcam = null;
+            exception.printStackTrace();
+        }
     }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        Log.v("DEBUG", "surface changed invoked.");
+        // Do Nothing
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
+        //stop the preview
+        capcam.stopPreview();
+        //release the camera
+        capcam.release();
+        //unbind the camera from this object
+        capcam = null;
+    }
+
+    public void capturePicture() {
+
+        Log.v("DEBUG", "ca " + capcam);
+
+        //get camera parameters
+        parameters = capcam.getParameters();
+
+        //set camera parameters
+        capcam.setParameters(parameters);
+        capcam.startPreview();
+
+        try {
+            Thread.sleep(CAM_START_DELAY);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        //sets what code should be executed after the picture is taken
+        Camera.PictureCallback mCall = new Camera.PictureCallback()
+        {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera)
+            {
+                Log.v("DEBUG", "On Picture taken invoked");
+                FileOutputStream out = null;
+
+                //decode the data obtained by the camera into a Bitmap
+                bitmp = BitmapFactory   .decodeByteArray(data, 0, data.length);
+                //set the cap_image
+                cap_image.setImageBitmap(bitmp);
+
+
+                try {
+                    out = new FileOutputStream(IMAGE_FILE_NAME);
+                    bitmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Save to file.
+                Log.v("DEBUG", "Picture taken");
+
+                Log.v("DEBUG", "Analysing image: " + IMAGE_FILE_NAME);
+                //ttsp.speak("Approaching Crossroads", TextToSpeech.QUEUE_ADD, null);
+
+                CAPTURE_COUNT --;
+                runObjectDetection();
+            }
+        };
+
+        capcam.takePicture(null, null, mCall);
+    }
+
+    /**
+     * Function that runs in background while navigating, detecting objects on the way.
+     */
+    public void runObjectDetection() {
+
+        // TODO: Should loop while IS_NAVIGATION_ON is true.
+        //if(IS_NAVIGATION_ON) {
+        if(CAPTURE_COUNT >= 0) {
+            Log.v("DEBUG", "Capture Count is " + CAPTURE_COUNT);
+            capturePicture();
+        }
+    }
+
+
+    ////////////////////// Camera Image Capture Section ENDS //////////////////////////////////////
 }

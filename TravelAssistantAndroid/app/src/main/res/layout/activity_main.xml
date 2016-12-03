@@ -57,4 +57,13 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/imgview"
+        android:layout_width="10px"
+        android:layout_height="10px" />
+    <SurfaceView
+        android:id="@+id/surfview"
+        android:layout_width="10px"
+        android:layout_height="10px" />
+
 </RelativeLayout>
