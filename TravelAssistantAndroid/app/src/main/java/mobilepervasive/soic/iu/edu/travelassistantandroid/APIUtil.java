@@ -163,7 +163,7 @@ public class APIUtil {
         protected String doInBackground(Object... objects) {
             try {
                 OkHttpClient client = new OkHttpClient();
-                String url = String.format(Constants.TIME_TO_DEST_URL, objects[0], objects[1], objects[2]);
+                String url = String.format(Constants.REQUEST_UBER_RIDE_URL, objects[0], objects[1], objects[2]);
                 Log.v(TAG, "Request Uber Ride API Url: " + url);
 
                 // construct request JSON
