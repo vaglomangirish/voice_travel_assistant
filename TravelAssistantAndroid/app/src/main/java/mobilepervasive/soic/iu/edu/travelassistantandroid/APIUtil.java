@@ -23,6 +23,10 @@ public class APIUtil {
         new NearestBusStopTask().execute(latitude, longitude);
     }
 
+    public void getNextBusToDest(String destination, double latitude, double longitude) {
+        new NextBusToDestTask().execute(destination, latitude, longitude);
+    }
+
     private class NearestBusStopTask extends AsyncTask<Double, Void, String> {
         @Override
         protected String doInBackground(Double... doubles) {
@@ -37,7 +41,7 @@ public class APIUtil {
                 Response response = client.newCall(request).execute();
                 return response.body().string();
             } catch (Exception ex) {
-                Log.e(TAG, "Exception calling API: " + ex);
+                Log.e(TAG, "nearest_bus_stop | Exception calling API: " + ex);
             }
             return null;
         }
@@ -45,9 +49,37 @@ public class APIUtil {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-            Log.d(TAG, "API Response: " + response);
+            Log.d(TAG, "nearest_bus_stop | API Response: " + response);
             // speak out response
             MainActivity.getTtsp().speak(String.format(Constants.NEAREST_BUS_RESPONSE_TEXT, response), TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private class NextBusToDestTask extends AsyncTask<Object, Void, String> {
+        @Override
+        protected String doInBackground(Object... objects) {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format(Constants.NEXT_BUS_TO_DEST_URL, objects[0], objects[1], objects[2]);
+                Log.v(TAG, "Next bus to destination API Url: " + url);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception ex) {
+                Log.e(TAG, "next_bus_to_dest | Exception calling API: " + ex);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            Log.d(TAG, "next_bus_to_dest | API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 }

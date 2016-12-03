@@ -31,6 +31,7 @@ public class QuestionAnsweringUtil {
     // categories of questions
     private static final String NEAREST_BUS_STATIONS = "nearest_bus_stations";
     private static final String NEXT_BUS_TO_DEST = "next_bus_to_dest";
+    private static final String NEXT_BUS_DETAILS = "next_bus_details";
 
     // utility class for calling apis
     private static APIUtil apiUtil = new APIUtil();
@@ -38,6 +39,7 @@ public class QuestionAnsweringUtil {
     static {
         questionMap.put(NEAREST_BUS_STATIONS, getTagsForNearestBusstops());
         questionMap.put(NEXT_BUS_TO_DEST, getTagsForNextBusToDest());
+        questionMap.put(NEXT_BUS_DETAILS, getTagsForNextBusDetails());
     }
 
     public static void processQuestion(String questionText, double latitude, double longitude) {
@@ -46,17 +48,9 @@ public class QuestionAnsweringUtil {
             if (questionCategory.equals(NEAREST_BUS_STATIONS)) {
                 // submit api call
                 apiUtil.getNearestBusStops(latitude, longitude);
-
-//                while (!APIUtil.apiComplete) {
-//                    // api call is not complete, wait
-//                    Log.v(TAG, "API call submitted, waiting for response.");
-//                    SystemClock.sleep(1000);
-//                }
-//                // speak out response
-//                MainActivity.getTtsp().speak(String.format(Constants.NEAREST_BUS_RESPONSE_TEXT, APIUtil.responseObject.getString("name")), TextToSpeech.QUEUE_FLUSH, null);
-//
-//                // set api complete to false
-//                APIUtil.apiComplete = false;
+            } else if (questionCategory.equals(NEXT_BUS_TO_DEST)) {
+                // submit api call
+                apiUtil.getNextBusToDest(destinationName, latitude, longitude);
             }
         } catch (Exception ex) {
             Log.e(TAG, "Failed to process question, reason: " + ex);
@@ -142,6 +136,29 @@ public class QuestionAnsweringUtil {
         tags.add("sample");
         tags.add("gates");
 
+        return tags;
+    }
+
+    /**
+     * Gets the tags for question related to getting more details about next bus
+     *  example questions:
+     *      - can you give me some more details
+     *      - i need more details
+     *      - tell me more
+     * @return
+     */
+    private static List<String> getTagsForNextBusDetails() {
+        List<String> tags = new ArrayList<String>();
+        tags.add("can");
+        tags.add("you");
+        tags.add("give");
+        tags.add("tell");
+        tags.add("i");
+        tags.add("me");
+        tags.add("need");
+        tags.add("some");
+        tags.add("more");
+        tags.add("details");
         return tags;
     }
 

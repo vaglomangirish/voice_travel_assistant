@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     String command = result.get(0);
                     txtSpeechInput.setText(command);
 
-                    ttsp.speak("I heard, " + command, TextToSpeech.QUEUE_FLUSH, null);
+//                    ttsp.speak("I heard, " + command, TextToSpeech.QUEUE_FLUSH, null);
 
                     // process the voice command
                     processVoiceCommand(QUESTION_ASK, command);
