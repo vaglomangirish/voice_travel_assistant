@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import request
 
-import json
 import googlemaps
+import send_txt_sms
 
 from pprint import pprint
 
@@ -241,6 +241,11 @@ def get_time_to_dest(destination):
     print response_str
     return response_str
 
+@app.route("/requestride", methods=['POST'])
+def request_ride():
+    # delegate it to send_txt_sms.py
+    response = send_txt_sms.request_ride(request=request)
+    return response
 
 def main():
     app.run()
