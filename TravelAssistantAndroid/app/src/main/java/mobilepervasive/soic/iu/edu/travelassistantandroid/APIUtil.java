@@ -27,6 +27,14 @@ public class APIUtil {
         new NextBusToDestTask().execute(destination, latitude, longitude);
     }
 
+    public void getNextBusDetails(String destination, double latitude, double longitude) {
+        new NextBusDetailsTask().execute(destination, latitude, longitude);
+    }
+
+    public void getTimeToDest(String destination, double latitude, double longitude) {
+        new TimeToDestTask().execute(destination, latitude, longitude);
+    }
+
     private class NearestBusStopTask extends AsyncTask<Double, Void, String> {
         @Override
         protected String doInBackground(Double... doubles) {
@@ -78,6 +86,62 @@ public class APIUtil {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
             Log.d(TAG, "next_bus_to_dest | API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private class NextBusDetailsTask extends AsyncTask<Object, Void, String> {
+        @Override
+        protected String doInBackground(Object... objects) {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format(Constants.NEXT_BUS_DETAILS_URL, objects[0], objects[1], objects[2]);
+                Log.v(TAG, "Next bus details API Url: " + url);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception ex) {
+                Log.e(TAG, "next_bus_details | Exception calling API: " + ex);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            Log.d(TAG, "next_bus_details | API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private class TimeToDestTask extends AsyncTask<Object, Void, String> {
+        @Override
+        protected String doInBackground(Object... objects) {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format(Constants.TIME_TO_DEST_URL, objects[0], objects[1], objects[2]);
+                Log.v(TAG, "Time to dest API Url: " + url);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception ex) {
+                Log.e(TAG, "time_to_dest | Exception calling API: " + ex);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            Log.d(TAG, "time_to_dest | API Response: " + response);
             // speak out response
             MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
         }

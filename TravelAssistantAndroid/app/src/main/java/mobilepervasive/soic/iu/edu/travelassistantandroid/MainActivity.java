@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             recognizer.startListening(searchName);
         }
         else if (searchName.equals(QUESTION_ASK)) {
-            recognizer.startListening(searchName, 10000);
+            recognizer.startListening(searchName, 20000);
         }
         else {
             promptSpeechInput();

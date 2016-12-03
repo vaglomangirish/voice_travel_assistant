@@ -32,6 +32,7 @@ public class QuestionAnsweringUtil {
     private static final String NEAREST_BUS_STATIONS = "nearest_bus_stations";
     private static final String NEXT_BUS_TO_DEST = "next_bus_to_dest";
     private static final String NEXT_BUS_DETAILS = "next_bus_details";
+    private static final String TIME_DO_DEST = "time_to_dest";
 
     // utility class for calling apis
     private static APIUtil apiUtil = new APIUtil();
@@ -40,6 +41,7 @@ public class QuestionAnsweringUtil {
         questionMap.put(NEAREST_BUS_STATIONS, getTagsForNearestBusstops());
         questionMap.put(NEXT_BUS_TO_DEST, getTagsForNextBusToDest());
         questionMap.put(NEXT_BUS_DETAILS, getTagsForNextBusDetails());
+        questionMap.put(TIME_DO_DEST, getTagsForTimeToDest());
     }
 
     public static void processQuestion(String questionText, double latitude, double longitude) {
@@ -51,6 +53,12 @@ public class QuestionAnsweringUtil {
             } else if (questionCategory.equals(NEXT_BUS_TO_DEST)) {
                 // submit api call
                 apiUtil.getNextBusToDest(destinationName, latitude, longitude);
+            } else if (questionCategory.equals(NEXT_BUS_DETAILS)) {
+                // submit api call
+                apiUtil.getNextBusDetails(destinationName, latitude, longitude);
+            } else if(questionCategory.equals(TIME_DO_DEST)) {
+                // submit api call
+                apiUtil.getTimeToDest(destinationName, latitude, longitude);
             }
         } catch (Exception ex) {
             Log.e(TAG, "Failed to process question, reason: " + ex);
@@ -165,6 +173,30 @@ public class QuestionAnsweringUtil {
         tags.add("about");
         tags.add("this");
         tags.add("bus");
+        return tags;
+    }
+
+    /**
+     * Gets the tags for question related to finding out time to dest
+     *  example questions:
+     *      - how long will take me to get there
+     *
+     * @return
+     */
+    private static List<String> getTagsForTimeToDest() {
+        List<String> tags = new ArrayList<String>();
+        // start of question
+        tags.add("how");
+        tags.add("long");
+        tags.add("will");
+        tags.add("it");
+        // person
+        tags.add("me");
+        // general
+        tags.add("take");
+        tags.add("to");
+        tags.add("get");
+        tags.add("there");
         return tags;
     }
 

@@ -82,6 +82,7 @@ def get_next_bus_to_dest(destination):
     print response_str
     return response_str
 
+
 @app.route('/next_bus_details/<destination>')
 def get_next_bus_details(destination):
     # extract lat, long from request
@@ -101,7 +102,6 @@ def get_next_bus_details(destination):
     bus_departing_stop = None
     bus_arriving_stop = None
     bus_number_of_stops = None
-
 
     # final output string
     response_str = "The next bus to your destination, is number {}, {}. " \
@@ -159,6 +159,88 @@ def get_next_bus_details(destination):
                                        bus_agency)
     print response_str
     return response_str
+
+
+@app.route('/time_to_dest/<destination>')
+def get_time_to_dest(destination):
+    # extract lat, long from request
+    latitude = request.args.get('lat')
+    longitude = request.args.get('long')
+
+    # construct origin & destination coordinates
+    origin_coordinates = (latitude, longitude)
+    destination_coordinates = ()
+
+    # result pieces
+    dist_by_bus = None
+    time_by_bus = None
+    dist_by_walk = None
+    time_by_walk = None
+    dist_by_car = None
+    time_by_car = None
+
+    # final output string
+    response_str = "Okay, I have an answer. " \
+                   "Your requested destination is {}. " \
+                   "I calculated, that, if you take a bus, it will take you {} to travel a distance of {}. " \
+                   "But, if you take an UBER, it will take you {} to travel a distance of {}. " \
+                   "Also, if you decide to walk, it will take you {} to walk a distance of {}. " \
+                   "Hope that answers your question."
+
+    # use geocoding to get coordinates
+    destination_info = gmaps.geocode(destination)
+    if (destination_info.__len__() > 0):
+        dest_lat = destination_info[0]['geometry']['location']['lat']
+        dest_long = destination_info[0]['geometry']['location']['lng']
+        destination_coordinates = (dest_lat, dest_long)
+        pass
+
+    # get next bus details
+    bus_distance_matrix = gmaps.distance_matrix(origins=origin_coordinates,
+                                                destinations=destination_coordinates,
+                                                mode='transit',
+                                                transit_mode='bus',
+                                                units='imperial')
+    if (bus_distance_matrix['status'] == 'OK'):
+        if (bus_distance_matrix['rows'].__len__()):
+            elements = bus_distance_matrix['rows'][0]['elements']
+            if (elements.__len__() > 0):
+                if(elements[0]['status'] == 'OK'):
+                    dist_by_bus = elements[0]['distance']['text'].replace('mi', 'miles')
+                    time_by_bus = elements[0]['duration']['text']
+
+
+    car_distance_matrix = gmaps.distance_matrix(origins=origin_coordinates,
+                                                destinations=destination_coordinates,
+                                                mode='driving',
+                                                units='imperial')
+    if (car_distance_matrix['status'] == 'OK'):
+        if (car_distance_matrix['rows'].__len__()):
+            elements = car_distance_matrix['rows'][0]['elements']
+            if (elements.__len__() > 0):
+                if(elements[0]['status'] == 'OK'):
+                    dist_by_car = elements[0]['distance']['text'].replace('mi', 'miles')
+                    time_by_car = elements[0]['duration']['text']
+
+    walk_distance_matrix = gmaps.distance_matrix(origins=origin_coordinates,
+                                                 destinations=destination_coordinates,
+                                                 mode='walking',
+                                                 units='imperial')
+    if (walk_distance_matrix['status'] == 'OK'):
+        if (walk_distance_matrix['rows'].__len__()):
+            elements = walk_distance_matrix['rows'][0]['elements']
+            if (elements.__len__() > 0):
+                if(elements[0]['status'] == 'OK'):
+                    dist_by_walk = elements[0]['distance']['text'].replace('mi', 'miles')
+                    time_by_walk = elements[0]['duration']['text']
+
+    response_str = response_str.format(destination,
+                                       time_by_bus, dist_by_bus,
+                                       time_by_car, dist_by_car,
+                                       time_by_walk, dist_by_walk)
+    print response_str
+    return response_str
+
 
 def main():
     app.run()
