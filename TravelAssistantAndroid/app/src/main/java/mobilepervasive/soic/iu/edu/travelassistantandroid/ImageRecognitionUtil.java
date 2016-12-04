@@ -126,7 +126,7 @@ public class ImageRecognitionUtil {
 
                 // check if crossroads
                 if(isZebraCrossingDetected) {
-                    MainActivity.getTtsp().speak(Constants.ZEBRA_CROSSING_ALERT,
+                    VisualRecDemo.getTtsp().speak(Constants.ZEBRA_CROSSING_ALERT,
                             TextToSpeech.QUEUE_ADD, null);
                 }
 
@@ -139,7 +139,7 @@ public class ImageRecognitionUtil {
                     }
 
                     VisualRecDemo.getTtsp().speak(to_speak, TextToSpeech.QUEUE_ADD, null);
-                } else {
+                } else if(!isZebraCrossingDetected) {
                     VisualRecDemo.getTtsp().speak(Constants.CANNOT_UNDERSTAND_WHAT_I_SEE,
                             TextToSpeech.QUEUE_ADD, null);
                 }

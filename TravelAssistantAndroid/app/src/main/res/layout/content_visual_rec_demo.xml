@@ -27,12 +27,12 @@
             android:id="@+id/surfviewd"
             android:layout_width="wrap_content"
             android:layout_height="0pt"
-            android:layout_weight=".40" />
+            android:layout_weight=".50" />
         <Button
             android:id="@+id/click_button"
             android:layout_width="fill_parent"
             android:layout_height="0pt"
-            android:layout_weight=".20"
+            android:layout_weight=".10"
             android:text="@string/capture"/>
 
     </LinearLayout>

@@ -33,7 +33,7 @@ public class Constants {
     // Constants for Image Recognition.
     public static final String IMAGE_CLASSIFIER_ID = "zcross_1753080880";
 
-    public static final String IMAGE_VP_API_KEY = "b34b3d1f4dc43112ea5933a5b8cbee86ee0b17d5";
+    public static final String IMAGE_VP_API_KEY = "b34b3d1f4dc43112eaxxxxxxxxxxxxxxxxxxxx";
 
     public static final String IMAGE_VR_SERVICE_URL = "https://gateway-a.watsonplatform.net" +
             "/visual-recognition/api/v3/classify?api_key=" +
