@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "473469094780",
+    "firebase_url": "https://voicetravelassis-1480362299163.firebaseio.com",
+    "project_id": "voicetravelassis-1480362299163",
+    "storage_bucket": "voicetravelassis-1480362299163.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473469094780:android:7cc5e9f67c4b47ef",
+        "android_client_info": {
+          "package_name": "mobilepervasive.soic.iu.edu.travelassistantandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473469094780-li7r3msp8snb2vvq4b59dalcit80bva2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY-7pWp4AySUEnDsgqtcx3NB7ak3kzAu8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
