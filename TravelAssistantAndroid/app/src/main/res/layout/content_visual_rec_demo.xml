@@ -20,16 +20,19 @@
 
         <ImageView
             android:id="@+id/imgviewd"
-            android:layout_width="fill_parent"
-            android:layout_height="400px" />
+            android:layout_width="wrap_content"
+            android:layout_height="0pt"
+            android:layout_weight=".40" />
         <SurfaceView
             android:id="@+id/surfviewd"
-            android:layout_width="fill_parent"
-            android:layout_height="400px" />
+            android:layout_width="wrap_content"
+            android:layout_height="0pt"
+            android:layout_weight=".40" />
         <Button
             android:id="@+id/click_button"
             android:layout_width="fill_parent"
-            android:layout_height="100px"
+            android:layout_height="0pt"
+            android:layout_weight=".20"
             android:text="@string/capture"/>
 
     </LinearLayout>
