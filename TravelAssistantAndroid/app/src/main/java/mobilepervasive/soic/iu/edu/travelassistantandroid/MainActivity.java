@@ -283,13 +283,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
             SystemClock.sleep(1500);
             switchSearch("asking-a-question");
-        } else if (text.contains(WEATHER) && text.contains("today")) {
-            // get weather for today
-            Log.v(TAG, "Getting weather for today.");
-            new APIUtil().getWeatherToday();
-
-            SystemClock.sleep(1500);
-            switchSearch(KWS_SEARCH);
         }
     }
 

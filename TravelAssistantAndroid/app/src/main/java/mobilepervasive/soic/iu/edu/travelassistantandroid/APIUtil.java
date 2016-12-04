@@ -50,6 +50,10 @@ public class APIUtil {
         new GetWeatherTodayTask().execute();
     }
 
+    public void getWeatherTomorrow() {
+        new GetWeatherTomorrowTask().execute();
+    }
+
     private class NearestBusStopTask extends AsyncTask<Double, Void, String> {
         @Override
         protected String doInBackground(Double... doubles) {
@@ -228,6 +232,34 @@ public class APIUtil {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
             Log.d(TAG, "get_weather_today | API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private class GetWeatherTomorrowTask extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format(Constants.GET_WEATHER_TOMORROW_URL);
+                Log.v(TAG, "Get weather tomorrow API Url: " + url);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception ex) {
+                Log.e(TAG, "get_weather_tomorrow | Exception calling API: " + ex);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            Log.d(TAG, "get_weather_tomorrow | API Response: " + response);
             // speak out response
             MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
         }

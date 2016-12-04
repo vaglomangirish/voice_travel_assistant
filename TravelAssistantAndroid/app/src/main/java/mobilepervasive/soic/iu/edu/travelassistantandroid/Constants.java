@@ -21,7 +21,7 @@ public class Constants {
 
     public static final String UPDATE_REFRESH_TOKEN_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/update_refresh_token/%s";
 
-    public static final String GET_WEATHER_TODAY_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/get_weather_today";
+    public static final String GET_WEATHER_TODAY_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/get_weather_now";
 
     public static final String GET_WEATHER_TOMORROW_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/get_weather_tomorrow";
 

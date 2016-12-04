@@ -35,6 +35,9 @@ public class QuestionAnsweringUtil {
     private static final String TIME_DO_DEST = "time_to_dest";
     private static final String REQUEST_UBER_RIDE = "request_uber_ride";
 
+    private static final String WEATHER_TODAY = "weather_today";
+    private static final String WEATHER_TOMORROW = "weather_tomorrow";
+
     // utility class for calling apis
     private static APIUtil apiUtil = new APIUtil();
 
@@ -44,6 +47,8 @@ public class QuestionAnsweringUtil {
         questionMap.put(NEXT_BUS_DETAILS, getTagsForNextBusDetails());
         questionMap.put(TIME_DO_DEST, getTagsForTimeToDest());
         questionMap.put(REQUEST_UBER_RIDE, getTagsForRequestUberRide());
+        questionMap.put(WEATHER_TODAY, getTagsForWeatherToday());
+        questionMap.put(WEATHER_TOMORROW, getTagsForWeatherTomorrow());
     }
 
     public static void processQuestion(String questionText, double latitude, double longitude) {
@@ -64,6 +69,12 @@ public class QuestionAnsweringUtil {
             } else if(questionCategory.equals(REQUEST_UBER_RIDE)) {
                 // submit api call
                 apiUtil.requestUberRide(destinationName, latitude, longitude);
+            } else if(questionCategory.equals(WEATHER_TODAY)) {
+                // submit api call
+                apiUtil.getWeatherToday();
+            } else if(questionCategory.equals(WEATHER_TOMORROW)) {
+                // submit api call
+                apiUtil.getWeatherTomorrow();
             }
         } catch (Exception ex) {
             Log.e(TAG, "Failed to process question, reason: " + ex);
@@ -226,6 +237,60 @@ public class QuestionAnsweringUtil {
         tags.add("an");
         tags.add("uber");
         tags.add("to");
+        return tags;
+    }
+
+    /**
+     * Gets the tags for question related to weather forecast today
+     *  example questions:
+     *      - how is the climate outside today
+     *      - what is the weather forecast for today
+     *
+     * @return
+     */
+    private static List<String> getTagsForWeatherToday() {
+        List<String> tags = new ArrayList<String>();
+        // start of question
+        tags.add("tell");
+        tags.add("how");
+        tags.add("what");
+        tags.add("is");
+        tags.add("the");
+        // weather
+        tags.add("climate");
+        tags.add("weather");
+        tags.add("forecast");
+        // general
+        tags.add("for");
+        tags.add("today");
+        tags.add("outside");
+        return tags;
+    }
+
+    /**
+     * Gets the tags for question related to weather forecast today
+     *  example questions:
+     *      - how is the climate tomorrow
+     *      - tell me the weather forecast for tomorrow
+     *
+     * @return
+     */
+    private static List<String> getTagsForWeatherTomorrow() {
+        List<String> tags = new ArrayList<String>();
+        // start of question
+        tags.add("tell");
+        tags.add("how");
+        tags.add("what");
+        tags.add("is");
+        tags.add("the");
+        // weather
+        tags.add("climate");
+        tags.add("weather");
+        tags.add("forecast");
+        // general
+        tags.add("for");
+        tags.add("tomorrow");
+        tags.add("outside");
         return tags;
     }
 
