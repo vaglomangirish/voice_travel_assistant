@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TravelAssistPushMsg</string>
+    <string name="walk_straight">WALK STRAIGHT</string>
+    <string name="walk_back">WALK BACKWARDS</string>
+    <string name="turn_left">TURN LEFT</string>
+    <string name="turn_right">TURN RIGHT</string>
+    <string name="stop">STOP!!</string>
+</resources>
