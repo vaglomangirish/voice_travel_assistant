@@ -3,6 +3,7 @@ from flask import request
 
 import googlemaps
 import send_txt_sms
+import fcm_push_notifications
 
 from pprint import pprint
 
@@ -246,6 +247,16 @@ def request_ride():
     # delegate it to send_txt_sms.py
     response = send_txt_sms.request_ride(request=request)
     return response
+
+@app.route("/send_push_notification/<message>")
+def send_push_notification(message):
+    fcm_push_notifications.send_push_notification(message_body=message)
+    return "SUCCESS"
+
+@app.route("/update_refresh_token/<new_token>")
+def update_refresh_token(new_token):
+    fcm_push_notifications.update_refresh_token(new_token);
+    return "SUCCESS"
 
 def main():
     app.run()
