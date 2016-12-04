@@ -46,6 +46,10 @@ public class APIUtil {
         new RequestUberRideTask().execute(destination, latitude, longitude);
     }
 
+    public void getWeatherToday() {
+        new GetWeatherTodayTask().execute();
+    }
+
     private class NearestBusStopTask extends AsyncTask<Double, Void, String> {
         @Override
         protected String doInBackground(Double... doubles) {
@@ -198,6 +202,34 @@ public class APIUtil {
                 // speak out failure
                 MainActivity.getTtsp().speak(Constants.REQUEST_UBER_FAILURE, TextToSpeech.QUEUE_FLUSH, null);
             }
+        }
+    }
+
+    private class GetWeatherTodayTask extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format(Constants.GET_WEATHER_TODAY_URL);
+                Log.v(TAG, "Get weather today API Url: " + url);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception ex) {
+                Log.e(TAG, "get_weather_today | Exception calling API: " + ex);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            Log.d(TAG, "get_weather_today | API Response: " + response);
+            // speak out response
+            MainActivity.getTtsp().speak(response, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 }

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 
+import pyowm
 import googlemaps
 import send_txt_sms
 import fcm_push_notifications
@@ -9,6 +10,7 @@ from pprint import pprint
 
 app = Flask(__name__)
 gmaps = googlemaps.Client(key='AIzaSyBKXtm4_ZK_JqlEQGuOOplSmFZSYS6BmXw')
+owm = pyowm.OWM('ab293a3a2da3164b2f3210b44e0344a4')
 
 
 @app.route('/nearest_bustop')
@@ -206,10 +208,9 @@ def get_time_to_dest(destination):
         if (bus_distance_matrix['rows'].__len__()):
             elements = bus_distance_matrix['rows'][0]['elements']
             if (elements.__len__() > 0):
-                if(elements[0]['status'] == 'OK'):
+                if (elements[0]['status'] == 'OK'):
                     dist_by_bus = elements[0]['distance']['text'].replace('mi', 'miles')
                     time_by_bus = elements[0]['duration']['text']
-
 
     car_distance_matrix = gmaps.distance_matrix(origins=origin_coordinates,
                                                 destinations=destination_coordinates,
@@ -219,7 +220,7 @@ def get_time_to_dest(destination):
         if (car_distance_matrix['rows'].__len__()):
             elements = car_distance_matrix['rows'][0]['elements']
             if (elements.__len__() > 0):
-                if(elements[0]['status'] == 'OK'):
+                if (elements[0]['status'] == 'OK'):
                     dist_by_car = elements[0]['distance']['text'].replace('mi', 'miles')
                     time_by_car = elements[0]['duration']['text']
 
@@ -231,7 +232,7 @@ def get_time_to_dest(destination):
         if (walk_distance_matrix['rows'].__len__()):
             elements = walk_distance_matrix['rows'][0]['elements']
             if (elements.__len__() > 0):
-                if(elements[0]['status'] == 'OK'):
+                if (elements[0]['status'] == 'OK'):
                     dist_by_walk = elements[0]['distance']['text'].replace('mi', 'miles')
                     time_by_walk = elements[0]['duration']['text']
 
@@ -242,21 +243,66 @@ def get_time_to_dest(destination):
     print response_str
     return response_str
 
+
 @app.route("/requestride", methods=['POST'])
 def request_ride():
     # delegate it to send_txt_sms.py
     response = send_txt_sms.request_ride(request=request)
     return response
 
+
 @app.route("/send_push_notification/<message>")
 def send_push_notification(message):
     fcm_push_notifications.send_push_notification(message_body=message)
     return "SUCCESS"
 
+
 @app.route("/update_refresh_token/<new_token>")
 def update_refresh_token(new_token):
     fcm_push_notifications.update_refresh_token(new_token);
     return "SUCCESS"
+
+
+@app.route("/get_weather_now")
+def get_weather_now():
+    obs = owm.weather_at_place('bloomington, indiana, usa')
+    w = obs.get_weather()
+    temperature = w.get_temperature('celsius')
+
+    status = w.get_status()
+    if status.lower() == 'clouds':
+        status = 'it is cloudy'
+    elif status == 'Snow':
+        status = 'it is going to snow'
+
+    return "The weather today in, Bloomington Indiana is, {}.  " \
+           "It is, {} degree celsius now. But it is expected to go as low as, {} degrees, " \
+           "and high as, {} degrees. Hope this answers your question.".format(status,
+                                                                              temperature['temp'],
+                                                                              temperature['temp_min'],
+                                                                              temperature['temp_max'])
+
+
+@app.route("/get_weather_tomorrow")
+def get_weather_tomorrow():
+    forecast = owm.daily_forecast('bloomington, indiana, usa')
+    tomorrow = pyowm.timeutils.tomorrow()
+    obs = forecast.get_weather_at(tomorrow)
+
+    temperature = obs.get_temperature('celsius')
+    status = obs.get_status()
+
+    if status.lower() == 'clouds':
+        status = 'it is cloudy'
+    elif status == 'Snow':
+        status = 'it is going to snow'
+
+    return "The forecast for tomorrow in, Bloomington Indiana is, {}. " \
+           "It is going to be, {} degree celsius tomorrow. With a low of, {} degrees, " \
+           "and a high of, {} degrees. Hope this answers your question.".format(status,
+                                                                                temperature['day'],
+                                                                                temperature['min'],
+                                                                                temperature['max'])
 
 def main():
     app.run()

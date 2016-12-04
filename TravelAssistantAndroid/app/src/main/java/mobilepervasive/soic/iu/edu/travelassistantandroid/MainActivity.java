@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     /* Named searches allow to quickly reconfigure the decoder */
     private static final String KWS_SEARCH = "wakeup";
     private static final String QUESTION_ASK = "question";
+    private static final String WEATHER = "weather";
 
     /* Keyword we are looking for to activate menu */
     private static final String KEYPHRASE = "hello assistant";
@@ -282,6 +283,13 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
             SystemClock.sleep(1500);
             switchSearch("asking-a-question");
+        } else if (text.contains(WEATHER) && text.contains("today")) {
+            // get weather for today
+            Log.v(TAG, "Getting weather for today.");
+            new APIUtil().getWeatherToday();
+
+            SystemClock.sleep(1500);
+            switchSearch(KWS_SEARCH);
         }
     }
 
@@ -353,6 +361,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         // Create grammar-based search for selection between demos
         File questionGrammar = new File(assetsDir, "question_ask.gram");
         recognizer.addGrammarSearch(QUESTION_ASK, questionGrammar);
+
+        File weatherGrammar = new File(assetsDir, "weather.gram");
+        recognizer.addGrammarSearch(WEATHER, weatherGrammar);
     }
 
     @Override

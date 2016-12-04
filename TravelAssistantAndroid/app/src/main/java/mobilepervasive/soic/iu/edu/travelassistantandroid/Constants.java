@@ -21,6 +21,10 @@ public class Constants {
 
     public static final String UPDATE_REFRESH_TOKEN_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/update_refresh_token/%s";
 
+    public static final String GET_WEATHER_TODAY_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/get_weather_today";
+
+    public static final String GET_WEATHER_TOMORROW_URL = "http://" + SERVER_HOSTNAME + ":" + SERVER_HOST_PORT + "/get_weather_tomorrow";
+
     // response strings to speak
     public static final String NEAREST_BUS_RESPONSE_TEXT = "I have an answer! The nearest bus stop to your location is, %s.";
     public static final String REQUEST_UBER_SUCCESS = "Sure. I have submitted an UBER request for you. You should receive an SMS confirmation soon.";

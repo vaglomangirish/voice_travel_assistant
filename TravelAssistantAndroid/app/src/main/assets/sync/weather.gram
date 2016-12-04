@@ -1,0 +1,8 @@
+#JSGF V1.0;
+
+grammar weather;
+
+<word> = what | is | the | weather | forecast | outside | for | climate | temperature;
+
+public <today> = <word>* today <word>*;
+public <tomorrow> = <word>* tomorrow <word>*;
