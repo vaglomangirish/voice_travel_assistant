@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Callback{
 
@@ -41,6 +43,12 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
     private ImageRecognitionUtil imageRecUtil;
 
     private Button clickButton;
+
+    private static TextToSpeech ttsp;
+
+    public static TextToSpeech getTtsp() {
+        return ttsp;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +75,15 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
             @Override
             public void onClick(View view) {
                 capturePicture();
+            }
+        });
+
+        ttsp=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    ttsp.setLanguage(Locale.US);
+                }
             }
         });
     }
