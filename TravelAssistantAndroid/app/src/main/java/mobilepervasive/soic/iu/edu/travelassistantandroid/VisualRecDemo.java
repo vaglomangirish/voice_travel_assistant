@@ -2,8 +2,10 @@ package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Callback{
 
@@ -41,6 +44,12 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
     private ImageRecognitionUtil imageRecUtil;
 
     private Button clickButton;
+
+    private static TextToSpeech ttsp;
+
+    public static TextToSpeech getTtsp() {
+        return ttsp;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +76,15 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
             @Override
             public void onClick(View view) {
                 capturePicture();
+            }
+        });
+
+        ttsp=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    ttsp.setLanguage(Locale.US);
+                }
             }
         });
     }
@@ -115,6 +133,7 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
         //set camera parameters
         capcam.setParameters(parameters);
         capcam.startPreview();
+        capcam.setDisplayOrientation(90);
 
         try {
             Thread.sleep(MainActivity.CAM_START_DELAY);
@@ -131,14 +150,16 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
 
                 //decode the data obtained by the camera into a Bitmap
                 bitmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+                bitmp = rotateBitmap(bitmp, 90);
+
                 //set the cap_image
                 cap_image.setImageBitmap(bitmp);
 
-
                 try {
                     out = new FileOutputStream("/sdcard/Download/" + MainActivity.IMAGE_FILE_NAME);
-                    bitmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                    // PNG is a lossless format, the compression factor (100) is ignored
+                    bitmp.compress(Bitmap.CompressFormat.PNG, 100, out);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -160,5 +181,13 @@ public class VisualRecDemo extends AppCompatActivity implements SurfaceHolder.Ca
         };
 
         capcam.takePicture(null, null, mCall);
+    }
+
+    public static Bitmap rotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 }

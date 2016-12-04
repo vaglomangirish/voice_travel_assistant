@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,8 +50,8 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 
 import static android.widget.Toast.makeText;
 
-public class MainActivity extends AppCompatActivity implements RecognitionListener,
-        SurfaceHolder.Callback {
+public class MainActivity extends AppCompatActivity implements RecognitionListener/*,
+        SurfaceHolder.Callback*/ {
 
     private static final String TAG = "TravelAssistantActivity";
 
@@ -69,20 +70,22 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private BroadcastReceiver receiver;
 
     //a variable to store a reference to the Image View at the main.xml file
-    private ImageView cap_image;
+    //private ImageView cap_image;
     //a variable to store a reference to the Surface View at the main.xml file
-    private SurfaceView surfView;
+    // SurfaceView surfView;
+
+    private Button demo_button;
 
     //a bitmap to display the captured image
     private Bitmap bitmp;
 
     //Camera variables
     //a surface holder
-    private SurfaceHolder surfhold;
+    //private SurfaceHolder surfhold;
     //a variable to control the camera
-    private Camera capcam;
+    //private Camera capcam;
     //the camera parameters
-    private Camera.Parameters parameters;
+    //private Camera.Parameters parameters;
 
     private static TextToSpeech ttsp;
 
@@ -120,23 +123,32 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         setContentView(R.layout.activity_main);
 
         //get the Image View at the main.xml file
-        cap_image = (ImageView) findViewById(R.id.imgview);
+        //cap_image = (ImageView) findViewById(R.id.imgview);
 
         //get the Surface View at the main.xml file
-        surfView = (SurfaceView) findViewById(R.id.surfview);
+        //surfView = (SurfaceView) findViewById(R.id.surfview);
 
         //Get a surface
-        surfhold = surfView.getHolder();
+        //surfhold = surfView.getHolder();
 
         //add the callback interface methods defined below as the Surface View callbacks
-        surfhold.addCallback(this);
+        //surfhold.addCallback(this);
 
         //tells Android that this surface will have its data constantly replaced
-        surfhold.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        //surfhold.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
         captionTxt = (TextView) findViewById(R.id.captionText);
         btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
+
+        demo_button = (Button) findViewById(R.id.demo_button);
+
+        demo_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, VisualRecDemo.class));
+            }
+        });
 
         // hide the action bar
         if(getActionBar() != null) {
@@ -451,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     ////////////////////// Camera Image Capture Section //////////////////////////////////////////
 
-    @Override
+    /*@Override
     public void surfaceCreated(SurfaceHolder holder)
     {
         Log.v(TAG, "SurfaceCreatedInvoked");
@@ -547,9 +559,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         capcam.takePicture(null, null, mCall);
     }
 
-    /**
+    *//**
      * Function that runs in background while navigating, detecting objects on the way.
-     */
+     *//*
     public void runObjectDetection() {
 
         // TODO: Should loop while IS_NAVIGATION_ON is true.
@@ -558,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             Log.v(TAG, "Capture Count is " + CAPTURE_COUNT);
             capturePicture();
         }
-    }
+    }*/
 
 
     ////////////////////// Camera Image Capture Section ENDS //////////////////////////////////////

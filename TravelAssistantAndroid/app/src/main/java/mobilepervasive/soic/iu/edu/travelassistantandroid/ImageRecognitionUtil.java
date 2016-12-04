@@ -1,14 +1,18 @@
 package mobilepervasive.soic.iu.edu.travelassistantandroid;
 
 import android.os.AsyncTask;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -39,11 +43,6 @@ public class ImageRecognitionUtil {
                 OkHttpClient client = new OkHttpClient();
                 String url = String.format(Constants.IMAGE_VR_SERVICE_URL);
                 Log.v(TAG, "Image recognition URL: " + url);
-                /*Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-
-                //Response response = client.newCall(request).execute();*/
 
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
@@ -66,7 +65,12 @@ public class ImageRecognitionUtil {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
 
-                    System.out.println(response.body().string());
+                    //TODO Speak out the identified objects.
+                    String responseStr = response.body().string();
+
+                    Log.v(TAG, responseStr);
+
+                    speakWhatSeen(responseStr);
                 }
 
 
@@ -80,6 +84,71 @@ public class ImageRecognitionUtil {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+        }
+
+        protected void speakWhatSeen(String responseBody){
+
+            Set<String> objList = new HashSet<String>();
+            Boolean isZebraCrossingDetected = false;
+
+            try {
+                JSONObject response = new JSONObject(responseBody);
+                JSONArray imagesArr = (JSONArray) response.get("images");
+                JSONArray classifierArr = (JSONArray) new JSONObject(imagesArr.get(0).toString())
+                        .get("classifiers");
+
+                // handle empty response.
+                if (classifierArr.length() == 0 ) {
+                    VisualRecDemo.getTtsp().speak(Constants.CANNOT_UNDERSTAND_WHAT_I_SEE,
+                            TextToSpeech.QUEUE_ADD, null);
+
+                    return;
+                }
+
+                JSONObject classifier;
+                JSONArray itemList;
+                String item;
+
+                for( int x=0; x < classifierArr.length(); x++ ) {
+                    classifier = classifierArr.getJSONObject(x);
+                    itemList = classifier.getJSONArray("classes");
+
+                    for ( int y = 0; y < itemList.length(); y++ ) {
+                        item = itemList.getJSONObject(y).getString("class");
+
+                        if(item.equals("zcross")){
+                            isZebraCrossingDetected = true;
+                        } else {
+                            objList.add(item);
+                        }
+                    }
+                }
+
+                // check if crossroads
+                if(isZebraCrossingDetected) {
+                    VisualRecDemo.getTtsp().speak(Constants.ZEBRA_CROSSING_ALERT,
+                            TextToSpeech.QUEUE_ADD, null);
+                }
+
+                // speak out other items.
+                if (objList.size() > 0) {
+                    String to_speak = Constants.PRE_OTHER_REC_ITEMS;
+
+                    for (String classItem : objList) {
+                        to_speak += " " + classItem + ",";
+                    }
+
+                    VisualRecDemo.getTtsp().speak(to_speak, TextToSpeech.QUEUE_ADD, null);
+                } else if(!isZebraCrossingDetected) {
+                    VisualRecDemo.getTtsp().speak(Constants.CANNOT_UNDERSTAND_WHAT_I_SEE,
+                            TextToSpeech.QUEUE_ADD, null);
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+
         }
     }
 }
